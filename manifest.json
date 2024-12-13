@@ -1,0 +1,22 @@
+{
+    "browser_action": {
+        "browser_style": true,
+        "default_title": "Tabs",
+        "default_popup": "src/index.html"
+    },
+    "commands": {
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Space",
+                "mac": "MacCtrl+Space"
+            },
+            "description": ""
+        }
+    },
+    "description": "",
+    "homepage_url": "https://github.com/blackgolyb",
+    "manifest_version": 2,
+    "name": "Tabs",
+    "permissions": ["tabs"],
+    "version": "1.0"
+}
