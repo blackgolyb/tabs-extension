@@ -29,27 +29,59 @@ const extensionHTML = `
 </div>
 `;
 
-let isTabsPopupOpen = false;
+const ExtMods = {
+    Close: "Close",
+    Select: "Select",
+    Search: "Search",
+    SearchSelect: "SearchSelect",
+};
+let extMod = ExtMods.Close;
 let popupRef;
 
+function addHandlers() {
+    popupRef.addEventListener("click", (e) => {
+        removePopup();
+    });
+    popupRef.addEventListener("keydown", (event) => {
+        if (event.key === "/") {
+            console.log("search");
+        }
+    });
+}
+
 function createPopup() {
-    isTabsPopupOpen = true;
-    popupRef = htmlToNode(extensionHTML);
-    document.body.appendChild(popupRef);
+    extMod = ExtMods.Select;
+    showPopup();
 }
 
 function removePopup() {
-    isTabsPopupOpen = false;
-    if (popupRef) {
-        document.body.removeChild(popupRef);
-        popupRef = undefined;
-    }
+    extMod = ExtMods.Close;
+    hidePopup();
 }
 
-document.addEventListener("keydown", (event) => {
-    if (!isTabsPopupOpen && event.ctrlKey && event.key === " ") {
-        createPopup();
-    } else if (isTabsPopupOpen && event.key === "Escape") {
-        removePopup();
-    }
-});
+function hidePopup() {
+    popupRef.classList.add("hidden");
+}
+
+function showPopup() {
+    popupRef.classList.remove("hidden");
+}
+
+function initTabsExtension() {
+    document.addEventListener("keydown", (event) => {
+        if (extMod === ExtMods.Close && event.ctrlKey && event.key === " ") {
+            event.stopImmediatePropagation();
+            createPopup();
+        } else if (extMod !== ExtMods.Close && event.key === "Escape") {
+            event.stopImmediatePropagation();
+            removePopup();
+        }
+    });
+    popupRef = htmlToNode(extensionHTML);
+    popupRef.classList.add("hidden");
+    hidePopup();
+    addHandlers();
+    document.body.appendChild(popupRef);
+}
+
+initTabsExtension();
