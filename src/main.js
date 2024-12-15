@@ -72,6 +72,9 @@ class Keybind {
         if (this.shift !== event.shiftKey) {
             return false;
         }
+        if (this.alt !== event.altKey) {
+            return false;
+        }
         if (this.meta !== event.metaKey) {
             return false;
         }
