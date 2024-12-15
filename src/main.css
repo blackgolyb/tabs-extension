@@ -1,4 +1,14 @@
 .tabs-extension {
+    --tabs-ext-backdrop-blur: 3px;
+    --tabs-ext-backdrop-color: #00000088;
+    --tabs-ext-bg-color: #222222;
+    --tabs-ext-active-tab-color: #595959;
+    --tabs-ext-text-color: #fbfbfb;
+    --tabs-ext-border-radius: 8px;
+    --tabs-ext-border-color: #464646;
+}
+
+.tabs-extension {
     position: fixed;
     width: 100dvw;
     height: 100dvh;
@@ -6,11 +16,27 @@
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    background-color: var(--lwt-accent-color);
+    background-color: var(--tabs-ext-backdrop-color);
+    backdrop-filter: blur(var(--tabs-ext-backdrop-blur));
+    opacity: 1;
+    transition: ease-in-out 0.07s;
+}
+
+.tabs-extension .hidden,
+.tabs-extension.hidden {
+    visibility: hidden;
+    opacity: 0;
+}
+
+body:has(.tabs-extension:not(.hidden)) {
+    overflow: hidden !important;
 }
 
 .tabs-extension .content {
     width: 40%;
     height: 60%;
-    background-color: #000;
+    background-color: var(--tabs-ext-bg-color);
+    color: var(--tabs-ext-text-color);
+    border: 1px solid var(--tabs-ext-border-color);
+    border-radius: var(--tabs-ext-border-radius);
 }
