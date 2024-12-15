@@ -29,34 +29,169 @@ const extensionHTML = `
 </div>
 `;
 
+function removeValueIfExist(arr, value) {
+    const idx = arr.indexOf(value);
+    if (idx !== -1) {
+        arr.splice(idx, 1);
+    }
+    return idx !== -1;
+}
+
+class Key {
+    constructor(name) {
+        this.name = name;
+    }
+
+    valueOf() {
+        return [this];
+    }
+}
+
+const CTRL = "CTRL";
+const SHIFT = "SHIFT";
+const ALT = "ALT";
+const META = "META";
+
+class Keybind {
+    constructor(keys) {
+        this.initKeybind(keys);
+    }
+
+    initKeybind(keys) {
+        this.ctrl = removeValueIfExist(keys, CTRL);
+        this.shift = removeValueIfExist(keys, SHIFT);
+        this.alt = removeValueIfExist(keys, ALT);
+        this.meta = removeValueIfExist(keys, META);
+        this.key = keys[0];
+    }
+
+    verifyEvent(event) {
+        if (this.ctrl !== event.ctrlKey) {
+            return false;
+        }
+        if (this.shift !== event.shiftKey) {
+            return false;
+        }
+        if (this.meta !== event.metaKey) {
+            return false;
+        }
+        return this.key === event.key;
+    }
+}
+
 const ExtMods = {
     Close: "Close",
     Select: "Select",
     Search: "Search",
     SearchSelect: "SearchSelect",
 };
-let extMod = ExtMods.Close;
-let popupRef;
 
-function addHandlers() {
-    popupRef.addEventListener("click", (e) => {
-        removePopup();
-    });
-    popupRef.addEventListener("keydown", (event) => {
-        if (event.key === "/") {
-            console.log("search");
+class ExtEvent {
+    constructor(mode, eventName) {
+        this.mode = mode;
+        this.eventName = eventName;
+    }
+}
+
+const ExtModsEvents = {
+    Close: {
+        ChoseMode: new ExtEvent(ExtMods.Close, "ChoseMode"),
+    },
+    Select: {
+        ChoseMode: new ExtEvent(ExtMods.Select, "ChoseMode"),
+        NextTab: new ExtEvent(ExtMods.Select, "NextTab"),
+        PrevTab: new ExtEvent(ExtMods.Select, "PrevTab"),
+    },
+    Search: {
+        ChoseMode: new ExtEvent(ExtMods.Search, "ChoseMode"),
+    },
+    SearchSelect: {
+        ChoseMode: new ExtEvent(ExtMods.SearchSelect, "ChoseMode"),
+        NextTab: new ExtEvent(ExtMods.SearchSelect, "NextTab"),
+        PrevTab: new ExtEvent(ExtMods.SearchSelect, "PrevTab"),
+    },
+};
+
+class EventManager {
+    constructor() {
+        this.currentMode = null;
+        this.eventMappings = new Map();
+        this.mappings = [];
+        this.initKeyListener();
+    }
+
+    initKeyListener() {
+        document.addEventListener("keydown", (e) => this.keyListener(e));
+    }
+
+    subscribe(event, callback) {
+        const callbacks = this.eventMappings.get(event) || [];
+        callbacks.push(callback);
+        this.eventMappings.set(event, callbacks);
+    }
+
+    map(mode, keybind, event) {
+        this.mappings.push([mode, keybind, event]);
+    }
+
+    emit(event) {
+        const callbacks = this.eventMappings.get(event) || [];
+        for (const callback of callbacks) {
+            callback();
         }
-    });
+    }
+
+    setMode(mode) {
+        this.currentMode = mode;
+    }
+
+    keyListener(e) {
+        const currentMode = this.currentMode;
+        for (const [mode, keybind, event] of this.mappings) {
+            if (
+                (mode === null || mode === currentMode) &&
+                keybind.verifyEvent(e)
+            ) {
+                this.emit(event);
+                e.stopPropagation();
+            }
+        }
+    }
 }
 
-function createPopup() {
-    extMod = ExtMods.Select;
-    showPopup();
-}
+const eventManager = new EventManager();
+let popupRef;
+const keybindings = [
+    [ExtMods.Close, [CTRL, " "], ExtModsEvents.Select.ChoseMode],
+    //Select mode
+    [ExtMods.Select, ["Escape"], ExtModsEvents.Close.ChoseMode],
+    [ExtMods.Select, ["f"], ExtModsEvents.Search.ChoseMode],
+    [ExtMods.Select, ["j"], ExtModsEvents.Select.NextTab],
+    [ExtMods.Select, ["k"], ExtModsEvents.Select.PrevTab],
+    //Search mode
+    [ExtMods.Search, ["Escape"], ExtModsEvents.Select.ChoseMode],
+    [ExtMods.Search, ["Enter"], ExtModsEvents.SearchSelect.ChoseMode],
+    //SearchSelect mode
+    [ExtMods.SearchSelect, ["Escape"], ExtModsEvents.Select.ChoseMode],
+    [ExtMods.SearchSelect, ["f"], ExtModsEvents.Search.ChoseMode],
+    [ExtMods.SearchSelect, ["j"], ExtModsEvents.SearchSelect.NextTab],
+    [ExtMods.SearchSelect, ["k"], ExtModsEvents.SearchSelect.PrevTab],
+];
 
-function removePopup() {
-    extMod = ExtMods.Close;
-    hidePopup();
+function initAppWorkflow() {
+    for (const [mode, keys, event] of keybindings) {
+        eventManager.map(mode, new Keybind(keys), event);
+    }
+
+    //Init modes switching
+    for (const mode of Object.values(ExtModsEvents)) {
+        eventManager.subscribe(mode.ChoseMode, () =>
+            eventManager.setMode(mode.ChoseMode.mode),
+        );
+    }
+
+    eventManager.subscribe(ExtModsEvents.Close.ChoseMode, hidePopup);
+    eventManager.subscribe(ExtModsEvents.Select.ChoseMode, showPopup);
 }
 
 function hidePopup() {
@@ -68,19 +203,9 @@ function showPopup() {
 }
 
 function initTabsExtension() {
-    document.addEventListener("keydown", (event) => {
-        if (extMod === ExtMods.Close && event.ctrlKey && event.key === " ") {
-            event.stopImmediatePropagation();
-            createPopup();
-        } else if (extMod !== ExtMods.Close && event.key === "Escape") {
-            event.stopImmediatePropagation();
-            removePopup();
-        }
-    });
+    initAppWorkflow();
     popupRef = htmlToNode(extensionHTML);
-    popupRef.classList.add("hidden");
-    hidePopup();
-    addHandlers();
+    eventManager.emit(ExtModsEvents.Close.ChoseMode);
     document.body.appendChild(popupRef);
 }
 
