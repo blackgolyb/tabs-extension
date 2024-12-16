@@ -5,9 +5,21 @@
     "description": "",
     "homepage_url": "https://github.com/blackgolyb/tabs-extension",
     "host_permissions": ["<all_urls>"],
-    "permissions": ["activeTab", "tabs"],
+    "permissions": ["tabs", "activeTab", "scripting"],
     "action": {
         "default_title": "Tabs"
+    },
+    "commands": {
+        "open": {
+            "suggested_key": {
+                "default": "Ctrl+Space",
+                "mac": "MacCtrl+Space"
+            },
+            "description": ""
+        },
+        "search": {
+            "description": ""
+        }
     },
     "content_scripts": [
         {
@@ -17,5 +29,8 @@
             "all_frames": true,
             "match_about_blank": true
         }
-    ]
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    }
 }

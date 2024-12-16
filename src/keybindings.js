@@ -1,4 +1,4 @@
-import { removeValueIfExist } from "./utils";
+import { removeValueIfExist } from "@/utils";
 
 export const CTRL = "CTRL";
 export const SHIFT = "SHIFT";

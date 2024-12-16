@@ -1,14 +1,13 @@
 {
-  "name": "firefox-extension",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "vite": "^6.0.1"
-  }
+    "name": "firefox-extension",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "build": "node scripts/build.js"
+    },
+    "devDependencies": {
+        "fs-extra": "^11.2.0",
+        "vite": "^6.0.1"
+    }
 }
