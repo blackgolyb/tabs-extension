@@ -1,17 +1,17 @@
 {
-    "browser_action": {
+    "action": {
         "default_title": "Tabs"
     },
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
-            "js": ["src/main.js"],
-            "css": ["src/main.css"]
+            "js": ["content.js"],
+            "css": ["styles.css"]
         }
     ],
     "description": "",
-    "homepage_url": "https://github.com/blackgolyb",
-    "manifest_version": 2,
+    "homepage_url": "https://github.com/blackgolyb/tabs-extension",
+    "manifest_version": 3,
     "name": "Tabs",
     "permissions": ["activeTab", "tabs"],
     "version": "1.0"
