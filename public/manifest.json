@@ -1,4 +1,11 @@
 {
+    "manifest_version": 3,
+    "name": "Tabs",
+    "version": "1.0",
+    "description": "",
+    "homepage_url": "https://github.com/blackgolyb/tabs-extension",
+    "host_permissions": ["<all_urls>"],
+    "permissions": ["activeTab", "tabs"],
     "action": {
         "default_title": "Tabs"
     },
@@ -6,13 +13,9 @@
         {
             "matches": ["<all_urls>"],
             "js": ["content.js"],
-            "css": ["styles.css"]
+            "css": ["styles.css"],
+            "all_frames": true,
+            "match_about_blank": true
         }
-    ],
-    "description": "",
-    "homepage_url": "https://github.com/blackgolyb/tabs-extension",
-    "manifest_version": 3,
-    "name": "Tabs",
-    "permissions": ["activeTab", "tabs"],
-    "version": "1.0"
+    ]
 }
