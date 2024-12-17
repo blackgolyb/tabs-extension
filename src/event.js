@@ -1,19 +1,20 @@
 import { Keybind } from "@/keybindings";
 
 export class ExtEvent {
-    constructor(id) {
+    constructor(id, tag) {
         this.id = id;
         this.data = null;
+        this.tag = tag || null;
     }
 
     create(data) {
-        const event = new ExtEvent(this.id);
+        const event = new ExtEvent(this.id, this.tag);
         event.data = data || null;
         return event;
     }
 
     hash() {
-        return JSON.stringify(this.id);
+        return JSON.stringify({ id: this.id, tag: this.tag });
     }
 }
 
@@ -21,9 +22,16 @@ export class ModeEvent extends ExtEvent {
     static CHANGE_MODE = "ChangeMode";
 
     constructor(mode, event) {
-        super({ mode, event });
+        super({ mode, event }, "ModeEvent");
         this.mode = mode;
         this.event = event;
+    }
+}
+
+export class CommandEvent extends ExtEvent {
+    constructor(command) {
+        super({ command }, "CommandEvent");
+        this.command = command;
     }
 }
 
@@ -48,13 +56,9 @@ class BaseEventListenerAdapter {
     }
 
     emit(event, data) {
-        // console.log("emit: ", event, data);
-        // console.log(this.eventSubscriber);
         const key = event.hash();
         const eventDirectCallbacks = this.eventSubscriber.get(key) || [];
-        // console.log(eventDirectCallbacks);
         const callbacks = this.subscribers.concat(eventDirectCallbacks);
-        // console.log(callbacks);
         for (const callback of callbacks) {
             callback(event.create(data));
         }
@@ -118,12 +122,9 @@ export class EventCompositor extends BaseEventListenerAdapter {
     }
 
     handleExternalEvent(event) {
-        // console.log("handleExternalEvent", this.currentMode, event);
-        // console.log(this.eventMappings);
         const currentMode = this.currentMode;
         const key = event.hash();
         const mappedEvents = this.eventMappings.get(key) || [];
-        // console.log(mappedEvents);
         for (const [mode, e] of mappedEvents) {
             if (mode === null || mode === currentMode) {
                 this.emit(e);

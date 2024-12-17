@@ -1,7 +1,3 @@
-import { CommandListener } from "@/event";
-
-const commandListener = new CommandListener();
-
 async function createCenteredPopup() {
     const screenWidth = window.screen.availWidth;
     const screenHeight = window.screen.availHeight;

@@ -1,6 +1,13 @@
 import { Keybind } from "@/keybindings";
-import { KeybindingsListener, EventCompositor, ExtEvent } from "@/event";
-import { keybindings, commands, ModsEvents, modes } from "@/mapping";
+import {
+    KeybindingsListener,
+    CommandListener,
+    EventCompositor,
+    CommandEvent,
+    ModsEvents,
+} from "@/event";
+import { modes } from "@/core/modes";
+import { keybindings, commands } from "@/core/mappings";
 import { htmlToNode } from "@/utils";
 
 const extensionHTML = `
@@ -32,7 +39,7 @@ function initAppWorkflow() {
         eventManager.map(mode, Keybind.fromKeys(keys).toEvent(), event);
     }
     for (const [mode, command, event] of commands) {
-        eventManager.map(mode, new ExtEvent(command), event);
+        eventManager.map(mode, new CommandEvent(command), event);
     }
 
     eventManager.subscribeEvent(ModsEvents.Close.ChoseMode, hidePopup);
