@@ -1,12 +1,8 @@
-import { Keybind } from "@/keybindings";
-import {
-    KeybindingsListener,
-    CommandListener,
-    EventCompositor,
-    CommandEvent,
-    ModsEvents,
-} from "@/event";
+import { ModeEventCompositor } from "@/libs/events/modeCompositor";
+import { Keybind, KeybindingsListener } from "@/libs/events/keybindings";
+import { CommandEvent } from "@/libs/events/browserCommands";
 import { modes } from "@/core/modes";
+import { ModsEvents } from "@/core/events";
 import { keybindings, commands } from "@/core/mappings";
 import { htmlToNode } from "@/utils";
 
@@ -21,9 +17,9 @@ const extensionHTML = `
 </div>
 `;
 
-const eventManager = new EventCompositor(modes);
+const mainEventProvider = new ModeEventCompositor(modes);
 const keybindingsListener = new KeybindingsListener();
-keybindingsListener.subscribe((e) => eventManager.handleExternalEvent(e));
+keybindingsListener.subscribe((e) => mainEventProvider.handleExternalEvent(e));
 let popupRef;
 
 function hidePopup() {
@@ -36,27 +32,28 @@ function showPopup() {
 
 function initAppWorkflow() {
     for (const [mode, keys, event] of keybindings) {
-        eventManager.map(mode, Keybind.fromKeys(keys).toEvent(), event);
+        mainEventProvider.map(mode, Keybind.fromKeys(keys).toEvent(), event);
     }
     for (const [mode, command, event] of commands) {
-        eventManager.map(mode, new CommandEvent(command), event);
+        mainEventProvider.map(mode, new CommandEvent(command), event);
     }
 
-    eventManager.subscribeEvent(ModsEvents.Close.ChoseMode, hidePopup);
-    eventManager.subscribeEvent(ModsEvents.Select.ChoseMode, showPopup);
+    mainEventProvider.subscribeEvent(ModsEvents.Close.ChoseMode, hidePopup);
+    mainEventProvider.subscribeEvent(ModsEvents.Select.ChoseMode, showPopup);
 }
 
 function initPublicEventApi() {
-    window.ExtTabsOpen = () => eventManager.emit(ModsEvents.Select.ChoseMode);
+    window.ExtTabsOpen = () =>
+        mainEventProvider.emit(ModsEvents.Select.ChoseMode);
     window.ExtTabsRegisterExternalListener = (l) =>
-        l.subscribe((e) => eventManager.handleExternalEvent(e));
+        l.subscribe((e) => mainEventProvider.handleExternalEvent(e));
 }
 
 function initTabsExtension() {
     initAppWorkflow();
     initPublicEventApi();
     popupRef = htmlToNode(extensionHTML);
-    eventManager.emit(ModsEvents.Close.ChoseMode);
+    mainEventProvider.emit(ModsEvents.Close.ChoseMode);
     document.body.appendChild(popupRef);
 }
 

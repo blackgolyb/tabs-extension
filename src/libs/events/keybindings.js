@@ -1,14 +1,19 @@
+import { ExtEvent, BaseEventListenerAdapter } from "./base";
+
 import { removeValueIfExist } from "@/utils";
-import { ExtEvent } from "./event";
 
 export const CTRL = "CTRL";
 export const SHIFT = "SHIFT";
 export const ALT = "ALT";
 export const META = "META";
 
-export class Keybind {
-    constructor() {}
+export class KeybingEvent extends ExtEvent {
+    constructor(keybind) {
+        super(keybind, "KeybingEvent");
+    }
+}
 
+export class Keybind {
     static fromKeys(keys) {
         const keybind = new Keybind();
         keybind.ctrl = removeValueIfExist(keys, CTRL);
@@ -30,21 +35,19 @@ export class Keybind {
     }
 
     toEvent() {
-        return new ExtEvent(this);
+        return new KeybingEvent(this);
     }
-    // verifyEvent(event) {
-    //     if (this.ctrl !== event.ctrlKey) {
-    //         return false;
-    //     }
-    //     if (this.shift !== event.shiftKey) {
-    //         return false;
-    //     }
-    //     if (this.alt !== event.altKey) {
-    //         return false;
-    //     }
-    //     if (this.meta !== event.metaKey) {
-    //         return false;
-    //     }
-    //     return this.key === event.key;
-    // }
+}
+
+export class KeybindingsListener extends BaseEventListenerAdapter {
+    initListener() {
+        document.addEventListener("keydown", (e) =>
+            this.handleKeyboardEvent(e),
+        );
+    }
+
+    handleKeyboardEvent(e) {
+        const keybind = Keybind.fromKeyboardEvent(e);
+        this.emit(keybind.toEvent());
+    }
 }

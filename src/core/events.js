@@ -1,4 +1,4 @@
-import { ModeEvent } from "@/event";
+import { ModeEvent } from "@/libs/events/modeCompositor";
 import { Modes } from "./modes";
 
 export const ModsEvents = {
