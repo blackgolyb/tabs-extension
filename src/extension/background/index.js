@@ -1,10 +1,6 @@
-// import { CommandListener } from "@/event";
-// import { commandMappings } from "@/mapping";
+import { CommandListener } from "@/event";
 
-// const commandListener = new CommandListener();
-// for (const [mode, command, event] of commandMappings) {
-//     commandListener.map(mode, command, event);
-// }
+const commandListener = new CommandListener();
 
 async function createCenteredPopup() {
     const screenWidth = window.screen.availWidth;

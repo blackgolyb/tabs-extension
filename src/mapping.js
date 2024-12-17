@@ -7,20 +7,22 @@ export const Modes = {
     SearchSelect: "SearchSelect",
 };
 
+export const modes = Object.values(Modes);
+
 export const ModsEvents = {
     Close: {
-        ChoseMode: new ModeEvent(Modes.Close, "ChoseMode"),
+        ChoseMode: new ModeEvent(Modes.Close, ModeEvent.CHANGE_MODE),
     },
     Select: {
-        ChoseMode: new ModeEvent(Modes.Select, "ChoseMode"),
+        ChoseMode: new ModeEvent(Modes.Select, ModeEvent.CHANGE_MODE),
         NextTab: new ModeEvent(Modes.Select, "NextTab"),
         PrevTab: new ModeEvent(Modes.Select, "PrevTab"),
     },
     Search: {
-        ChoseMode: new ModeEvent(Modes.Search, "ChoseMode"),
+        ChoseMode: new ModeEvent(Modes.Search, ModeEvent.CHANGE_MODE),
     },
     SearchSelect: {
-        ChoseMode: new ModeEvent(Modes.SearchSelect, "ChoseMode"),
+        ChoseMode: new ModeEvent(Modes.SearchSelect, ModeEvent.CHANGE_MODE),
         NextTab: new ModeEvent(Modes.SearchSelect, "NextTab"),
         PrevTab: new ModeEvent(Modes.SearchSelect, "PrevTab"),
     },
@@ -44,7 +46,7 @@ export const keybindings = [
     [Modes.SearchSelect, ["j"], ModsEvents.SearchSelect.NextTab],
     [Modes.SearchSelect, ["k"], ModsEvents.SearchSelect.PrevTab],
 ];
-export const commandMappings = [
+export const commands = [
     [Modes.Close, "open", ModsEvents.Select.ChoseMode], // provided by `open` command
     [Modes.Select, "search", ModsEvents.Search.ChoseMode], // provided by `search` command
     [Modes.SearchSelect, "search", ModsEvents.Search.ChoseMode], // provided by `search` command
