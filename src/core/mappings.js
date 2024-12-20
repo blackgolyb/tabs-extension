@@ -1,5 +1,7 @@
 import { Modes } from "./modes";
 import { ModsEvents } from "./events";
+import { CommandEvent } from "@/libs/events/browserCommands";
+import { Keybind } from "@/libs/events/keybindings";
 
 export const keybindings = [
     /*
@@ -25,3 +27,11 @@ export const commands = [
     [Modes.Select, "search", ModsEvents.Search.ChoseMode], // provided by `search` command
     [Modes.SearchSelect, "search", ModsEvents.Search.ChoseMode], // provided by `search` command
 ];
+
+export const mappings = [];
+for (const [mode, keys, event] of keybindings) {
+    mappings.push([mode, Keybind.fromKeys(keys).toEvent(), event]);
+}
+for (const [mode, command, event] of commands) {
+    mappings.push([mode, new CommandEvent(command), event]);
+}

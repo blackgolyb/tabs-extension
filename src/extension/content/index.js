@@ -1,60 +1,31 @@
 import { ModeEventCompositor } from "@/libs/events/modeCompositor";
-import { Keybind, KeybindingsListener } from "@/libs/events/keybindings";
-import { CommandEvent } from "@/libs/events/browserCommands";
+import { KeybindingsListener } from "@/libs/events/keybindings";
+import { ActiveTabEventProxy, Direction } from "@/libs/events/proxy";
 import { modes } from "@/core/modes";
 import { ModsEvents } from "@/core/events";
-import { keybindings, commands } from "@/core/mappings";
-import { htmlToNode } from "@/utils";
-
-const extensionHTML = `
-<div class="tabs-extension">
-    <div class="content">
-        <div class="search">
-            <input type="text" placeholder="Search..." />
-        </div>
-        <div class="tabs-list"></div>
-    </div>
-</div>
-`;
+import { mappings } from "@/core/mappings";
+import { createApp } from "../app";
 
 const mainEventProvider = new ModeEventCompositor(modes);
+const activeTabEventProxy = new ActiveTabEventProxy(Direction.Receive);
 const keybindingsListener = new KeybindingsListener();
+
 keybindingsListener.subscribe((e) => mainEventProvider.handleExternalEvent(e));
-let popupRef;
+activeTabEventProxy.subscribe((e) => mainEventProvider.handleExternalEvent(e));
 
-function hidePopup() {
-    popupRef.classList.add("hidden");
-}
-
-function showPopup() {
-    popupRef.classList.remove("hidden");
-}
-
-function initAppWorkflow() {
-    for (const [mode, keys, event] of keybindings) {
-        mainEventProvider.map(mode, Keybind.fromKeys(keys).toEvent(), event);
+function initAppWorkflow(app) {
+    for (const mapping of mappings) {
+        mainEventProvider.map(...mapping);
     }
-    for (const [mode, command, event] of commands) {
-        mainEventProvider.map(mode, new CommandEvent(command), event);
-    }
-
-    mainEventProvider.subscribeEvent(ModsEvents.Close.ChoseMode, hidePopup);
-    mainEventProvider.subscribeEvent(ModsEvents.Select.ChoseMode, showPopup);
-}
-
-function initPublicEventApi() {
-    window.ExtTabsOpen = () =>
-        mainEventProvider.emit(ModsEvents.Select.ChoseMode);
-    window.ExtTabsRegisterExternalListener = (l) =>
-        l.subscribe((e) => mainEventProvider.handleExternalEvent(e));
+    mainEventProvider.subscribeEvent(ModsEvents.Close.ChoseMode, app.hide);
+    mainEventProvider.subscribeEvent(ModsEvents.Select.ChoseMode, app.show);
+    mainEventProvider.emit(ModsEvents.Close.ChoseMode); // Close app by default
 }
 
 function initTabsExtension() {
-    initAppWorkflow();
-    initPublicEventApi();
-    popupRef = htmlToNode(extensionHTML);
-    mainEventProvider.emit(ModsEvents.Close.ChoseMode);
-    document.body.appendChild(popupRef);
+    const app = createApp(mainEventProvider);
+    initAppWorkflow(app);
+    document.body.appendChild(app.ref);
 }
 
 initTabsExtension();
