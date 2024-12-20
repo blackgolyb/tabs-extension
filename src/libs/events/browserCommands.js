@@ -13,6 +13,6 @@ export class CommandListener extends BaseEventListenerAdapter {
     }
 
     handleCommand(command) {
-        this.emit(new ExtEvent(command));
+        this.emit(new CommandEvent(command).create());
     }
 }

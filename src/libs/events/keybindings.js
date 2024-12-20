@@ -48,6 +48,6 @@ export class KeybindingsListener extends BaseEventListenerAdapter {
 
     handleKeyboardEvent(e) {
         const keybind = Keybind.fromKeyboardEvent(e);
-        this.emit(keybind.toEvent());
+        this.emit(keybind.toEvent().create());
     }
 }
