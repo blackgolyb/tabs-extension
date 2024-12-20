@@ -1,4 +1,4 @@
-.tabs-extension {
+.tbxt {
     --tabs-ext-backdrop-blur: 3px;
     --tabs-ext-backdrop-color: #00000088;
     --tabs-ext-bg-color: #222222;
@@ -6,37 +6,104 @@
     --tabs-ext-text-color: #fbfbfb;
     --tabs-ext-border-radius: 8px;
     --tabs-ext-border-color: #464646;
+    --tabs-ext-font-size: 14pt;
+    --tabs-ext-search-height: 2em;
 }
 
-.tabs-extension {
+.tbxt,
+.tbxt * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: var(--tabs-ext-text-color);
+    font-size: var(--tabs-ext-font-size);
+}
+
+.tbxt {
     position: fixed;
     width: 100dvw;
     height: 100dvh;
+    top: 0;
+    left: 0;
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 9999;
-    background-color: var(--tabs-ext-backdrop-color);
-    backdrop-filter: blur(var(--tabs-ext-backdrop-blur));
     opacity: 1;
     transition: ease-in-out 0.07s;
 }
 
-.tabs-extension .hidden,
-.tabs-extension.hidden {
+.tbxt.hidden {
     visibility: hidden;
     opacity: 0;
 }
 
-body:has(.tabs-extension:not(.hidden)) {
+body:has(.tbxt:not(.hidden)) {
     overflow: hidden !important;
 }
 
-.tabs-extension .content {
+.tbxt__content {
     width: 40%;
     height: 60%;
     background-color: var(--tabs-ext-bg-color);
-    color: var(--tabs-ext-text-color);
     border: 1px solid var(--tabs-ext-border-color);
     border-radius: var(--tabs-ext-border-radius);
+    overflow: hidden;
+}
+
+.tbxt__bg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -1;
+    background-color: var(--tabs-ext-backdrop-color);
+    backdrop-filter: blur(var(--tabs-ext-backdrop-blur));
+}
+
+@keyframes search-show {
+    0% {
+        height: 0;
+    }
+    75% {
+        height: calc(var(--tabs-ext-search-height) * 1.1);
+    }
+    100% {
+        height: var(--tabs-ext-search-height);
+    }
+}
+
+@keyframes search-hide {
+    0% {
+        visibility: visible;
+        height: var(--tabs-ext-search-height);
+    }
+    100% {
+        height: 0;
+    }
+}
+
+.tbxt__search {
+    width: 100%;
+    height: var(--tabs-ext-search-height);
+    border: none;
+    background: none;
+    outline: none;
+    padding-left: calc((var(--tabs-ext-search-height) - 1em) / 2);
+    border-bottom: 1px solid var(--tabs-ext-border-color);
+    border-radius: var(--tabs-ext-border-radius), var(--tabs-ext-border-radius),
+        0, 0;
+    animation: 0.2s ease-out 0s 1 search-show;
+}
+
+.tbxt__search.hidden {
+    animation: 0.1s ease-out 0s 1 search-hide;
+    visibility: hidden;
+    height: 0;
+}
+
+.tbxt__tabs-list {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }

@@ -1,14 +1,13 @@
 import { htmlToNode } from "@/utils";
 
 const extensionHTML = `
-<div class="tabs-extension">
-    <div class="content">
-        <div class="search">
-            <input type="text" placeholder="Search..." />
+<div class="tbxt" id="tbxt">
+    <div class="tbxt__content">
+        <input class="tbxt__search" id="tbxt-search" type="text" placeholder="Search..." />
+        <div class="tbxt__tabs-list">
         </div>
-        <div class="tabs-list"></div>
     </div>
-    <div class="bg"/>
+    <div class="tbxt__bg"/>
 </div>
 `;
 
