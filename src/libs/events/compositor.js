@@ -1,3 +1,5 @@
+import { ExtEvent, BaseEventListenerAdapter } from "./base";
+
 export class CompoiteEvent extends ExtEvent {
     constructor(event) {
         super(event, "CompoiteEvent");
